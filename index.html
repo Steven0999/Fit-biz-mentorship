@@ -17,9 +17,7 @@
       📈 Progress: <progress id="progressBar" value="0" max="100"></progress>
     </section>
 
-    <main id="lessonContainer">
-      <!-- Lessons will be added here dynamically -->
-    </main>
+    <main id="lessonContainer"></main>
 
     <section class="missions">
       <h2>📆 Daily Business Missions</h2>
@@ -33,6 +31,15 @@
         🎖 Badges: <span id="badgeList">None</span>
       </div>
     </section>
+  </div>
+
+  <!-- Modal for Chapters -->
+  <div id="chapterModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2 id="chapterTitle"></h2>
+      <ul id="chapterList"></ul>
+    </div>
   </div>
 
   <script src="script.js"></script>
