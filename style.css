@@ -1,0 +1,86 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6fa;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+}
+
+header {
+  background: #1a202c;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px;
+}
+
+.lesson {
+  background: #ffffff;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+.lesson.locked {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+button {
+  background: #3182ce;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+
+.progress {
+  margin: 1rem 0;
+}
+
+.stats {
+  margin-top: 2rem;
+  font-weight: bold;
+}
+
+.badges {
+  margin-top: 0.5rem;
+}
+
+.missions {
+  margin-top: 2rem;
+  background: #edf2f7;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+}
+
+.missions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.missions li {
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.missions button {
+  background: #48bb78;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
