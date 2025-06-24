@@ -1,145 +1,169 @@
-// Generate 20 lessons with 10 chapters each
-const lessons = Array.from({ length: 20 }, (_, i) => ({
-  title: `Lesson ${i + 1}: Step ${i + 1} to 7-Figure Biz`,
-  chapters: Array.from({ length: 10 }, (_, j) => `Chapter ${j + 1}: Task ${j + 1}`),
-  badge: `🏅 Badge ${i + 1}`
-}));
+const lessons = [
+  { title: "Define Your Niche" },
+  { title: "Create Your Offer" },
+  { title: "Build Your Website" },
+  { title: "Marketing Strategy" },
+  { title: "Sales Funnel Setup" },
+  { title: "Lead Magnet Creation" },
+  { title: "Email Campaigns" },
+  { title: "Social Media Branding" },
+  { title: "Client Onboarding" },
+  { title: "Scale With Ads" }
+];
 
-let xp = parseInt(localStorage.getItem("xp")) || 0;
-let level = parseInt(localStorage.getItem("level")) || 1;
+const lessonContainer = document.getElementById("lessonContainer");
+const progressBar = document.getElementById("progressBar");
+const xpCount = document.getElementById("xpCount");
+const levelCount = document.getElementById("levelCount");
+const streakCount = document.getElementById("streakCount");
+const badgeList = document.getElementById("badgeList");
+
+let completedChapters = {};
 let streak = parseInt(localStorage.getItem("streak")) || 0;
-let lastVisit = localStorage.getItem("lastVisit");
-let completedChapters = JSON.parse(localStorage.getItem("completedChapters") || "{}");
-let badges = JSON.parse(localStorage.getItem("badges") || "[]");
 
-const today = new Date().toDateString();
-const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 1);
-
-// Handle streaks
-if (lastVisit !== today) {
-  streak = (lastVisit === yesterday.toDateString()) ? streak + 1 : 1;
-  if (streak === 3) xp += 15;
-  if (streak === 7) xp += 30;
-  if (streak === 14) xp += 75;
-
-  localStorage.setItem("lastVisit", today);
-  localStorage.setItem("streak", streak);
-  localStorage.setItem("xp", xp);
+function renderLessons() {
+  lessonContainer.innerHTML = "";
+  lessons.forEach((lesson, index) => {
+    const div = document.createElement("div");
+    div.className = "lesson" + (completedChapters[index]?.length === 10 ? " completed" : "");
+    div.innerHTML = `
+      <strong>${lesson.title}</strong>
+      <div>
+        <button onclick="openModal(${index})">📘 View Chapters</button>
+        <button onclick="openScriptModal(${index})">📄 View Training Script</button>
+      </div>
+    `;
+    lessonContainer.appendChild(div);
+  });
 }
 
-// Update UI
-document.getElementById("streakCount").textContent = streak;
-document.getElementById("xpCount").textContent = xp;
-document.getElementById("levelCount").textContent = level;
-document.getElementById("badgeList").textContent = badges.length ? badges.join(", ") : "None";
+function openModal(index) {
+  const modal = document.getElementById("chapterModal");
+  const chapterTitle = document.getElementById("chapterTitle");
+  const chapterList = document.getElementById("chapterList");
 
-// Lessons rendering
-const lessonContainer = document.getElementById("lessonContainer");
-lessons.forEach((lesson, index) => {
-  const div = document.createElement("div");
-  div.className = "lesson" + (completedChapters[index]?.length === 10 ? " completed" : "");
-  div.innerHTML = `<strong>${lesson.title}</strong>`;
-  div.onclick = () => openModal(index);
-  lessonContainer.appendChild(div);
-});
-
-// Modal logic
-const chapterModal = document.getElementById("chapterModal");
-const chapterTitle = document.getElementById("chapterTitle");
-const chapterList = document.getElementById("chapterList");
-
-function openModal(lessonIndex) {
-  chapterModal.classList.remove("hidden");
-  chapterTitle.textContent = lessons[lessonIndex].title;
+  chapterTitle.textContent = lessons[index].title;
   chapterList.innerHTML = "";
 
-  lessons[lessonIndex].chapters.forEach((chapter, chapterIndex) => {
+  if (!completedChapters[index]) completedChapters[index] = [];
+
+  for (let i = 1; i <= 10; i++) {
     const li = document.createElement("li");
-    const isDone = completedChapters[lessonIndex]?.includes(chapterIndex);
-    li.innerHTML = `
-      <span>${chapter}</span>
-      <button ${isDone ? "disabled" : ""} onclick="completeChapter(${lessonIndex}, ${chapterIndex})">
-        ${isDone ? "✅ Done" : "Complete"}
-      </button>
-    `;
+    li.textContent = `Chapter ${i}`;
+    li.style.cursor = "pointer";
+    if (completedChapters[index].includes(i)) li.style.textDecoration = "line-through";
+
+    li.onclick = () => {
+      if (!completedChapters[index].includes(i)) {
+        completedChapters[index].push(i);
+        updateStats();
+        openModal(index);
+      }
+    };
     chapterList.appendChild(li);
-  });
+  }
+
+  modal.classList.remove("hidden");
 }
 
 function closeModal() {
-  chapterModal.classList.add("hidden");
+  document.getElementById("chapterModal").classList.add("hidden");
 }
 
-function completeChapter(lessonIndex, chapterIndex) {
-  completedChapters[lessonIndex] = completedChapters[lessonIndex] || [];
-  if (!completedChapters[lessonIndex].includes(chapterIndex)) {
-    completedChapters[lessonIndex].push(chapterIndex);
-    xp += 5;
-    if (xp >= level * 50) level += 1;
+function updateStats() {
+  let totalChapters = 10 * lessons.length;
+  let completed = Object.values(completedChapters).reduce((acc, arr) => acc + arr.length, 0);
+  progressBar.value = (completed / totalChapters) * 100;
+  xpCount.textContent = completed * 10;
+  levelCount.textContent = Math.floor((completed * 10) / 100);
+  streakCount.textContent = ++streak;
+  localStorage.setItem("streak", streak);
 
-    if (completedChapters[lessonIndex].length === 10 && !badges.includes(lessons[lessonIndex].badge)) {
-      badges.push(lessons[lessonIndex].badge);
-    }
-
-    localStorage.setItem("xp", xp);
-    localStorage.setItem("level", level);
-    localStorage.setItem("badges", JSON.stringify(badges));
-    localStorage.setItem("completedChapters", JSON.stringify(completedChapters));
-    location.reload();
+  if (completed === totalChapters) {
+    badgeList.textContent = "💼 Master Trainer, 🧗‍♂️ Business Climber";
   }
 }
 
-// Daily mission generator
-const missionPools = {
-  content: ["🎥 Make a Reel", "📝 Draft a post", "📷 Shoot a client win"],
-  sales: ["📞 DM 5 leads", "📧 Send sales email", "🤝 Follow up with client"],
-  mindset: ["📖 Read 5 mins", "🧘 Meditate 3 mins", "📓 Write biz affirmations"],
-  marketing: ["📈 Analyze IG insights", "🗣 Comment on 3 posts", "📊 Review funnel"]
-};
+function generateScriptPages(index) {
+  const title = lessons[index].title;
+  const detailedScripts = {
+    "Define Your Niche": [
+      `📄 Page 1: Your niche defines WHO you serve. Focus on a specific audience: busy moms, athletes, over-50s, etc. The tighter the niche, the stronger the appeal.`,
+      `⚙️ Page 2: Create a mission statement: \"I help [niche] achieve [result] using [method].\" Validate it via social media or SEO tools.`,
+      `❌ Page 3: Mistakes: Too broad or choosing a niche with no demand. Tip: Use Reddit, Quora, and FB groups to validate interest.`
+    ],
+    "Create Your Offer": [
+      `📄 Page 1: Your offer is your packaged transformation. It's more than workouts — it's value, method, promise.`,
+      `⚙️ Page 2: Define your core outcome, program structure, bonuses (e.g. meal guides), and price.`,
+      `❌ Page 3: Mistake: Selling sessions, not results. Tip: Sell the \"before & after\" transformation story.`
+    ],
+    "Build Your Website": [
+      `📄 Page 1: A website builds trust and authority. It’s your 24/7 business card.`,
+      `⚙️ Page 2: Include homepage, about, services, testimonials, contact, and lead magnet form.`,
+      `❌ Page 3: Mistake: Overdesigning or not having a CTA. Tip: Use simple drag-drop builders like Carrd, Wix, or Webflow.`
+    ],
+    "Marketing Strategy": [
+      `📄 Page 1: Marketing attracts attention. It’s how people find you.`,
+      `⚙️ Page 2: Choose your main channels: IG, TikTok, YouTube. Publish helpful, story-driven content.`,
+      `❌ Page 3: Mistake: Posting randomly. Tip: Use a weekly content calendar and batch creation.`
+    ],
+    "Sales Funnel Setup": [
+      `📄 Page 1: Funnels turn traffic into clients using a structured path: Freebie > Nurture > Offer.`,
+      `⚙️ Page 2: Create a landing page, thank-you email sequence, and offer delivery.`,
+      `❌ Page 3: Mistake: Not nurturing leads. Tip: Automate using MailerLite or ConvertKit.`
+    ],
+    "Lead Magnet Creation": [
+      `📄 Page 1: A lead magnet gives value in exchange for email/contact info.`,
+      `⚙️ Page 2: Offer a free PDF, checklist, or 5-day challenge relevant to your niche.`,
+      `❌ Page 3: Mistake: Generic titles. Tip: Use specific, urgent benefits like \"Lose 5lbs in 10 Days—Meal Blueprint\".`
+    ],
+    "Email Campaigns": [
+      `📄 Page 1: Emails nurture trust and build long-term clients.`,
+      `⚙️ Page 2: Set up welcome sequences, weekly tips, and pitch emails.`,
+      `❌ Page 3: Mistake: Only selling. Tip: Follow 3:1 value-to-pitch ratio.`
+    ],
+    "Social Media Branding": [
+      `📄 Page 1: Consistent visual & message branding builds recognition.`,
+      `⚙️ Page 2: Use a color palette, font style, and clear bio. Share wins, stories, and tips.`,
+      `❌ Page 3: Mistake: Looking like everyone else. Tip: Use Canva to create unique post styles.`
+    ],
+    "Client Onboarding": [
+      `📄 Page 1: Onboarding sets the tone for success.`,
+      `⚙️ Page 2: Send welcome email, client intake form, and orientation video.`,
+      `❌ Page 3: Mistake: Confusing first week. Tip: Create a simple Day 1 checklist.`
+    ],
+    "Scale With Ads": [
+      `📄 Page 1: Ads multiply results when organic works.`,
+      `⚙️ Page 2: Start with $5/day on Meta ads to lead magnet. Use Lookalike audiences.`,
+      `❌ Page 3: Mistake: Selling cold. Tip: Warm them up with your lead magnet first.`
+    ]
+  };
 
-function generateMissions() {
-  return Object.values(missionPools).map(pool => {
-    const task = pool[Math.floor(Math.random() * pool.length)];
-    return { text: task, xp: 5 };
+  return detailedScripts[title] || [`Page 1`, `Page 2`, `Page 3`];
+}
+
+function openScriptModal(index) {
+  const scriptModal = document.getElementById("trainingScriptModal");
+  const scriptTitle = document.getElementById("scriptTitle");
+  const scriptPages = document.getElementById("scriptPages");
+
+  scriptTitle.textContent = `Training Script: ${lessons[index].title}`;
+  scriptPages.innerHTML = "";
+
+  const pages = generateScriptPages(index);
+  pages.forEach(content => {
+    const div = document.createElement("div");
+    div.className = "script-page";
+    div.textContent = content;
+    scriptPages.appendChild(div);
   });
+
+  scriptModal.classList.remove("hidden");
 }
 
-const todayMissions = localStorage.getItem("missionDate") === today
-  ? JSON.parse(localStorage.getItem("dailyMissions"))
-  : generateMissions();
-
-localStorage.setItem("missionDate", today);
-localStorage.setItem("dailyMissions", JSON.stringify(todayMissions));
-
-const missionProgress = JSON.parse(localStorage.getItem("missionProgress") || "[]");
-
-const missionList = document.getElementById("missionList");
-todayMissions.forEach((mission, index) => {
-  const li = document.createElement("li");
-  const done = missionProgress.includes(index);
-  li.innerHTML = `
-    <span>${mission.text}</span>
-    <button ${done ? "disabled" : ""} onclick="completeMission(${index}, ${mission.xp})">
-      ${done ? "✅ Done" : "Do"}
-    </button>`;
-  missionList.appendChild(li);
-});
-
-function completeMission(index, xpGain) {
-  if (!missionProgress.includes(index)) {
-    missionProgress.push(index);
-    xp += xpGain;
-    if (xp >= level * 50) level += 1;
-
-    localStorage.setItem("xp", xp);
-    localStorage.setItem("level", level);
-    localStorage.setItem("missionProgress", JSON.stringify(missionProgress));
-    location.reload();
-  }
+function closeScriptModal() {
+  document.getElementById("trainingScriptModal").classList.add("hidden");
 }
 
-// Progress bar update
-const totalChapters = lessons.length * 10;
-const completed = Object.values(completedChapters).reduce((acc, arr) => acc + arr.length, 0);
-document.getElementById("progressBar").value = (completed / totalChapters) * 100;
+renderLessons();
+updateStats();
