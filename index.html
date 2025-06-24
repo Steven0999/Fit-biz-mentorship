@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fitness Biz Mastery</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏋️ Fitness Biz Mastery</h1>
+      <div id="streak">🔥 Streak: <span id="streakCount">0</span> days</div>
+    </header>
+
+    <section class="progress">
+      📈 Progress: <progress id="progressBar" value="0" max="100"></progress>
+    </section>
+
+    <main id="lessonContainer">
+      <!-- Lessons will be added here dynamically -->
+    </main>
+
+    <section class="missions">
+      <h2>📆 Daily Business Missions</h2>
+      <ul id="missionList"></ul>
+    </section>
+
+    <section class="stats">
+      💡 XP: <span id="xpCount">0</span> |
+      🧠 Level: <span id="levelCount">1</span>
+      <div class="badges">
+        🎖 Badges: <span id="badgeList">None</span>
+      </div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
